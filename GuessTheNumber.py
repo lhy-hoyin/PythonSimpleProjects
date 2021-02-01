@@ -1,5 +1,7 @@
 '''
 Author: BarryHY
+Date Created: 29 Jan 2021
+Date Updated: 01 Feb 2021
 Project Name: Guess The Number
 Description: Program randomly generate a number. Player to guess what the number is.
              If wrong, tell player guess is either too high, or too low.

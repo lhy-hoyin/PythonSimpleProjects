@@ -1,5 +1,7 @@
 '''
 Author: BarryHY
+Date Created: 29 Jan 2021
+Date Updated: 01 Feb 2021
 Project Name: Rock, Paper, Scissors Game
 Description: User to play rock, paper, scissors with the computer
 '''
