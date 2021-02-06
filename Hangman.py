@@ -18,25 +18,24 @@ def main():
     solvedFlag = False
 
     print("You have %d attempts to guess the word." % LIVES)
-    print("Enter any digit to quit.")
+    print("Enter any single digit to quit.")
 
-    #TODO - find a random word
-    mysteryWord = "helloworld"
-    mysteryWord = mysteryWord.upper() # Convert to caps
+    #TODO - find a random word, must block single char words, maybe added a min-char limit for generates word
+    mysteryWord = "HelloWorld"
+    #mysteryWord = mysteryWord.upper() # Convert to caps
 
     # Convert mysteryWord to list of dict
     word = []
-    for char in mysteryWord:
+    for char in mysteryWord.upper():
         word.append({char : False}) # False flag to hide letter
 
     # Continue game if player still have lives
     while (livesCount > 0 and not solvedFlag):
-        solvedFlag = True # set flag for condition checking later
         correctGuess = False
         print() #creates newline
 
         # Display lives left
-        print("Live(s): ", end = '')
+        print("Life: ", end = '')
         for x in range(livesCount):
             print(LIVES_UNICODE, end=" ") 
         print() # creates newline
@@ -47,36 +46,51 @@ def main():
             print(list(char.keys())[0] if list(char.values())[0] else '*', end = '')
         print() # creates newline
 
-        # Takes 1st char input, only, convert to caps
-        letter = input("Choose a single letter: ")[0].upper()
+        # Takes in user input
+        userInput = input("Choose a SINGLE letter or type out your WHOLE guess: ")
         
-        # Check for exiting condition
-        if letter.isnumeric():
-            print("You have entered a digit. Quitting...")
-            break; # exit game loop
-        
-        # Check if player guess is correct
-        for char_dict in word:
-            char = list(char_dict.keys())[0]
-            charSolved = list(char_dict.values())[0]
-            
-            # Matching character
-            if (letter == char):
+        # Player choose to guess the whole word
+        if len(userInput) > 1:
+            # Player guessed correctly
+            if mysteryWord.upper() == userInput.upper():
                 correctGuess = True
-                charSolved = True
-                char_dict[char] = charSolved # Show letter
+                solvedFlag = True
 
-            # Update unsolvedFlag
-            solvedFlag = solvedFlag and charSolved
+        # Player choose to guess a single letter
+        else:
+            # Takes 1st char only, convert to caps
+            letter = userInput[0].upper()
+        
+            # Check for exiting condition
+            if letter.isnumeric():
+                print("You have entered a digit. Quitting...")
+                break; # exit game loop
+            
+            solvedFlag = True # set flag for condition checking later
 
-        # Provide feedback on player's guess
-        if correctGuess:
-            print("%s is a correct letter." % letter)
-        else: # Deduct life for incorrect guess
+            # Check if player guess is correct
+            for char_dict in word:
+                char = list(char_dict.keys())[0]
+                charSolved = list(char_dict.values())[0]
+            
+                # Matching character
+                if (letter == char):
+                    correctGuess = True
+                    charSolved = True
+                    char_dict[char] = charSolved # Show letter
+
+                # Update solvedFlag
+                solvedFlag = solvedFlag and charSolved
+
+            if correctGuess:
+                print("%s is a correct letter." % letter)
+        
+        # Deduct live for incorrect guess
+        if not correctGuess:
             livesCount = livesCount - 1
-            print("Sorry, wrong guess. You lost a life.")
+            print("Sorry, wrong guess. You lost a life.") 
 
-    print() # create newline
+        print() # create newline
 
     # Player has solved the mystery word
     if solvedFlag:
