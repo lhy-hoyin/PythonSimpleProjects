@@ -10,34 +10,40 @@ Library Required: RandomWords (https://pypi.org/project/RandomWords/)
 
 from random_words import RandomWords
 
+# CONSTANTS - may be customised accordingly
+LIVES = 6
+LIVES_UNICODE = u'\u2665' #heart icon
+
 def main():
-    
-    # CONSTANTS - may be customised accordingly
-    LIVES = 6
-    LIVES_UNICODE = u'\u2665' #heart icon
-    
     print("===================")
     print("= = = HANGMAN = = =")
     print("===================")
 
-    livesCount = LIVES
-    solvedFlag = False
-
-    print("You have %d attempts to guess the word." % LIVES)
-    print("Enter any single digit to quit.")
+    # TODO : select playing mode (i.e. AI or 2-player)
 
     # Randomly generate a word
     mysteryWord = RandomWords().random_word()
+    
+    # Start the game
+    guess_the_word(mysteryWord)
 
-    # Convert mysteryWord to list of dict
+def guess_the_word(guessWord:str, lives:int = LIVES):
+    
+    livesCount = lives
+    solvedFlag = False
+    
+    print("You have %d attempts to guess the word." % livesCount)
+    print("Enter any single digit to quit.") #FIXME
+
+    # Convert guessWord to list of dict
     word = []
-    for char in mysteryWord.upper():
+    for char in guessWord.upper():
         word.append({char : False}) # False flag to hide letter
 
     # Continue game if player still have lives
     while (livesCount > 0 and not solvedFlag):
-        correctGuess = False
-        print() #creates newline
+        correctGuess = False # reset flag
+        print() # creates newline
 
         # Display lives left
         print("Life: ", end = '')
@@ -57,7 +63,7 @@ def main():
         # Player choose to guess the whole word
         if len(userInput) > 1:
             # Player guessed correctly
-            if mysteryWord.upper() == userInput.upper():
+            if guessWord.upper() == userInput.upper():
                 correctGuess = True
                 solvedFlag = True
 
@@ -99,7 +105,7 @@ def main():
 
     # Player has solved the mystery word
     if solvedFlag:
-        print("Congratulations! You solved \'%s\' with %d %s left." % (mysteryWord, livesCount, ("lives" if livesCount > 1 else "life")))
+        print("Congratulations! You solved \'%s\' with %d %s left." % (guessWord, livesCount, ("lives" if livesCount > 1 else "life")))
 
     # Player has lost all lives
     if livesCount < 1:
@@ -107,8 +113,6 @@ def main():
 
     # Finish game
     print("Thank you for playing!")
-
-
 
 if __name__ == "__main__":
     main()
