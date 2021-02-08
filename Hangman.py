@@ -1,8 +1,14 @@
 '''
 Author: BarryHY
+Date Created: 29 Jan 2021
+Date Updated: 08 Feb 2021
 Project Name: Hangman
 Description: Guess the word within the given attempts/lives
+
+Library Required: RandomWords (https://pypi.org/project/RandomWords/)
 '''
+
+from random_words import RandomWords
 
 def main():
     
@@ -20,9 +26,8 @@ def main():
     print("You have %d attempts to guess the word." % LIVES)
     print("Enter any single digit to quit.")
 
-    #TODO - find a random word, must block single char words, maybe added a min-char limit for generates word
-    mysteryWord = "HelloWorld"
-    #mysteryWord = mysteryWord.upper() # Convert to caps
+    # Randomly generate a word
+    mysteryWord = RandomWords().random_word()
 
     # Convert mysteryWord to list of dict
     word = []
