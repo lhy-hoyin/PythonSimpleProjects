@@ -10,6 +10,7 @@ Library Required: RandomWords (https://pypi.org/project/RandomWords/)
 
 from getpass import getpass
 from random_words import RandomWords
+import enchant
 
 # Game Parameters - may be customised accordingly
 LIVES = 6
@@ -22,6 +23,11 @@ def main():
     print("= = = HANGMAN = = =")
     print("===================")
 
+    # Create dictionary for language spelling checks
+    dicts = []
+    dicts.append(enchant.Dict("en_US"))
+    dicts.append(enchant.Dict("en_GB"))
+    
     # Game Loop
     while (True):
         # Display main menu to select playing mode
@@ -44,8 +50,10 @@ def main():
         if choice == '2':
             # Prompt player 1 to provide input
             print("\nPlayer One,")
-            givenWord = getpass("Please enter a WORD for Player Two to guess: (just type, word is hidden)")
-            #FIXME : world should be only alphabets (i.e not spaces,digits,dots,dashes, etc) , maybe check spelling too
+            while True:
+                givenWord = getpass("Please enter a WORD for Player Two to guess: (just type, word is hidden)")
+                if check_word(dicts, givenWord):
+                    break # only if word is considered as valid
             givenHint = input("Please enter a HINT to help Player Two: ")
             
             # Start game with player 1's word
@@ -139,6 +147,28 @@ def guess_the_word(mysteryWord:str, hint:str = None, lives:int = LIVES):
     # Player has lost all lives, reveal mysteryWord
     if lives < 1:
         print("Game Over! You have no lives left. The mystery word is \'%s\'." % mysteryWord)
+
+'''
+Checks if given word is considered valid
+
+parameter   [List]dictionaries  Language dictionaries to check spelling against
+parameter   [String]word        The word to check for validity and spelling
+return      [Boolean]           True if the word is valid
+'''
+def check_word(dictionaries: list, word:str) -> bool:  
+    # Check that is fully alphabet
+    if not word.isalpha():
+        print("Please only type ONE word - no space, dots, dashes, numbers, etc.")
+        return False
+        
+    # Check spelling to ensure word is spelled correctly
+    for langDict in dictionaries:
+        # If one if the language dictionary says the word is spelled correctly, then word is considered valid
+        if langDict.check(word):
+            return True
+    # None of the dictionary considers word as spelled correctly
+    print("Sorry, word not recognised. Please check spelling or choose another word.")
+    return False
 
 if __name__ == "__main__":
     main()
