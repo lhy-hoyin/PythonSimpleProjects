@@ -1,7 +1,7 @@
 '''
 Author: BarryHY
 Date Created: 29 Jan 2021
-Date Updated: 01 Feb 2021
+Date Updated: 12 Feb 2021
 Project Name: Rock, Paper, Scissors Game
 Description: User to play rock, paper, scissors with the computer
 '''
@@ -18,7 +18,7 @@ def main():
     print("=================================")
     
     random.seed()
-    winScore, loseScore, drawScore = 0,0,0
+    win_score, lose_score, draw_score = 0,0,0
     dict_ = {
         0 : QUIT_COMMAND,
         1 : "Rock",
@@ -60,19 +60,19 @@ def main():
         # Same move - Draw
         if (player == opponent):
             print("Result: Draw")
-            drawScore+=1
+            draw_score+=1
             continue
             
         # Different Move - Win/Lose
         if (player%3 < opponent%3):
-            loseScore+=1
+            lose_score+=1
             print("Result: Lose :(")
         else:
-            winScore+=1
+            win_score+=1
             print("Result: Win :)")
     
     # Print stats summary
-    print("Win: %d | Lose: %d | Draw: %d" % (winScore, loseScore, drawScore))
+    print("Win: %d | Lose: %d | Draw: %d" % (win_score, lose_score, draw_score))
             
 if __name__ == "__main__":
     main()

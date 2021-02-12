@@ -1,7 +1,7 @@
 '''
 Author: BarryHY
 Date Created: 29 Jan 2021
-Date Updated: 01 Feb 2021
+Date Updated: 12 Feb 2021
 Project Name: Guess The Number
 Description: Program randomly generate a number. Player to guess what the number is.
              If wrong, tell player guess is either too high, or too low.
@@ -9,32 +9,29 @@ Description: Program randomly generate a number. Player to guess what the number
 
 import random
 
+# Game Parameters - may be customised accordingly
+MIN_NUMBER = 0
+MAX_NUMBER = 20
+
 def main():
-    
-    # CONSTANTS - can be changed accordingly (eg. increase/decrease difficulty)
-    MIN_NUMBER = 0
-    MAX_NUMBER = 20
-    
     print("============================")
     print("= = = GUESS THE NUMBER = = =")
     print("============================")
     
-    triesCount = 0
+    tries_count = 0
     random.seed()
     number = random.randint(MIN_NUMBER, MAX_NUMBER)
     
     while True:
         guess = int(input("\nGuess a number between " + str(MIN_NUMBER) + " and " + str(MAX_NUMBER) + ": "))
-        triesCount+=1
+        tries_count+=1
         if (guess == number):
-            print("Congratulations! You took " + str(triesCount) + (" tries " if triesCount > 1 else " try ")+ "to guess the number correctly.")
+            print("Congratulations! You took " + str(tries_count) + (" tries " if tries_count > 1 else " try ")+ "to guess the number correctly.")
             break
         elif (guess > number):
             print("Your guess is too high. Try again.")
         elif (guess < number):
             print("Your guess is too low. Try again.")
         
-
-
 if __name__ == "__main__":
     main()
