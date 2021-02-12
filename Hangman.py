@@ -5,7 +5,9 @@ Date Updated: 12 Feb 2021
 Project Name: Hangman
 Description: Guess the word within the given attempts/lives. Multiple modes available.
 
-Library Required: RandomWords (https://pypi.org/project/RandomWords/)
+Library Required:
+    pyenchant   (https://pypi.org/project/pyenchant/)
+    RandomWords (https://pypi.org/project/RandomWords/)
 '''
 
 import enchant
