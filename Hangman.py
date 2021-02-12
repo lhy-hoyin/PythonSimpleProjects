@@ -1,16 +1,16 @@
 '''
 Author: BarryHY
 Date Created: 29 Jan 2021
-Date Updated: 08 Feb 2021
+Date Updated: 12 Feb 2021
 Project Name: Hangman
 Description: Guess the word within the given attempts/lives. Multiple modes available.
 
 Library Required: RandomWords (https://pypi.org/project/RandomWords/)
 '''
 
+import enchant
 from getpass import getpass
 from random_words import RandomWords
-import enchant
 
 # Game Parameters - may be customised accordingly
 LIVES = 6
