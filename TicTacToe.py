@@ -31,9 +31,12 @@ class TicTacToe(tk.Frame):
     row_size = 3
     col_size = 3
     win_requirement = 3
+
     board = None
     game_active = False
+    winning_matrices = []
     current_player = Player.NO_PLAYER
+    scores = {}
 
     def __init__(self, root: tk.Frame = None):
         super().__init__(root)
@@ -43,13 +46,29 @@ class TicTacToe(tk.Frame):
         self.root.minsize(300, 300)
         # FIXME: set window name (to appear at taskbar)
 
+        # Initialised scores
+        for p in Player:
+            if p == Player.NO_PLAYER:
+                self.scores["Draw"] = 0
+            else:
+                self.scores['Player ' + p.string] = 0
+
+        self.compute_win_conditions()
+        self.start_game()
+
+    def compute_win_conditions(self):
         # Ensure min board size of 3x3
         self.row_size = 3 if self.row_size < 3 else self.row_size
         self.col_size = 3 if self.col_size < 3 else self.col_size
         smaller_side = min(self.row_size, self.col_size)
         self.win_requirement = smaller_side if self.win_requirement > smaller_side else self.win_requirement
 
-        self.start_game()
+        # Create win conditions matrices
+        self.winning_matrices.clear()
+        self.winning_matrices.append(np.full((1, self.win_requirement), True))  # Row
+        self.winning_matrices.append(np.full((self.win_requirement, 1), True))  # Column
+        self.winning_matrices.append(np.identity(self.win_requirement, bool))  # Diagonal (Downwards)
+        self.winning_matrices.append(np.fliplr(np.identity(self.win_requirement, bool)))  # Diagonal (Upwards)
 
     def start_game(self):
         self.populate_menu()
@@ -72,8 +91,8 @@ class TicTacToe(tk.Frame):
         # Options Menu
         options_menu = tk.Menu(menu_bar, tearoff=0)
         # TODO: view rules
-        # TODO: view score
-        # TODO: settings
+        options_menu.add_command(label="Scores", command=self.view_scores)
+        # TODO: settings (e.g. always start with PLAYER_ONE)
 
         # Add the menus to menu bar
         menu_bar.add_cascade(label="New", menu=new_menu)
@@ -102,13 +121,38 @@ class TicTacToe(tk.Frame):
             for c in range(self.col_size):
                 arr[r][c] = self.board[r][c].occupied_by.value
 
-        print(arr)  # DEBUG
+        # print("Current Board:\n", arr)  # DEBUG
         return arr
 
     def check_for_winner(self) -> int:
-        # TODO
-        self.board_to_matrix()
-        pass
+        board_matrix = self.board_to_matrix()
+        for p in Player:
+            if p == Player.NO_PLAYER:
+                continue
+
+            # Mask current board with player enum value (False for non-player cells)
+            player_matrix = np.isin(board_matrix, p.value)
+
+            # Check for matches with any winning_matrices
+            # Loop through every element in player_matrix
+            for r in range(player_matrix.shape[0]):
+                for c in range(player_matrix.shape[1]):
+
+                    # Check for each possible winning matrix
+                    for win_matrix in self.winning_matrices:
+
+                        # Slice player_matrix according to shape of win_matrix
+                        sliced_matrix = player_matrix[r:r + win_matrix.shape[0], c:c + win_matrix.shape[1]]
+                        if sliced_matrix.shape != win_matrix.shape:  # Ignore sliced_matrix of incorrect shape
+                            continue
+
+                        result_matrix = np.logical_and(sliced_matrix, win_matrix)
+
+                        # Player has won game if fully match with win_matrix
+                        if result_matrix.all():
+                            return p.value
+
+        return Player.NO_PLAYER.value
 
     def board_is_full(self) -> bool:
         return np.all(self.board_to_matrix())
@@ -127,6 +171,13 @@ class TicTacToe(tk.Frame):
         self.current_player = Player.NO_PLAYER
         self.start_game()
 
+    def view_scores(self):
+        scores_text = ""
+        for score_key in self.scores.keys():
+            scores_text += score_key + ": " + str(self.scores[score_key]) + "\n"
+
+        tk.messagebox.showinfo(title="Scores", message=scores_text)
+
 
 class Cell:
     col = int
@@ -144,7 +195,7 @@ class Cell:
                                     textvariable=self.string_text,
                                     command=lambda: self.player_select_cell(game_instance),
                                     borderwidth=1)
-        self.btn_widget.grid(row=self.row, column=self.col, padx=1, pady=1, sticky='NSWE')
+        self.btn_widget.grid(row=self.row, column=self.col, padx=1, pady=1, sticky='NSEW')
 
         # Makes cells to resize according to window size
         game_instance.root.rowconfigure(self.row, weight=1)
@@ -166,21 +217,28 @@ class Cell:
         self.occupied_by = game_instance.current_player
         self.string_text.set(self.occupied_by.string)
 
-        # DEBUG
-        print("Cell: ", self.row, self.col)
-        print("Player:", game_instance.current_player, game_instance.current_player.value)
+        # Change player
+        game_instance.next_player_turn()  # for 2-player mode
 
-        # TODO: Check for winning condition
+        # Check for winner
+        winner = game_instance.check_for_winner()
+        if Player(winner) != Player.NO_PLAYER:
+            game_instance.scores['Player ' + Player(winner).string] += 1  # Update score
+            game_instance.game_active = False  # End game
 
-        # Check if game has finished (i.e. all cells filled)
-        if game_instance.board_is_full():
-            game_instance.game_active = False
-            start_new_game = tk.messagebox.askyesno(title="Game Finished", message="No empty space left.\nNew Game?")
+            win_msg = "Player " + Player(winner).string + " won.\nNew Game?"
+            start_new_game = tk.messagebox.askyesno(title="You Win", message=win_msg)
             if start_new_game:
                 game_instance.reset_game()
 
-        # Change player
-        game_instance.next_player_turn()  # for 2-player mode
+        # Check if game has finished (i.e. all cells filled)
+        if game_instance.board_is_full():
+            game_instance.scores['Draw'] += 1  # Update score
+            game_instance.game_active = False  # End game
+
+            start_new_game = tk.messagebox.askyesno(title="Game Finished", message="No empty space left.\nNew Game?")
+            if start_new_game:
+                game_instance.reset_game()
 
 
 if __name__ == "__main__":
