@@ -1,7 +1,7 @@
 """
 Author: BarryHY
 Date Created: 20 Feb 2021
-Date Updated: 20 Mar 2021
+Date Updated: 05 Apr 2021
 Project Name: TicTacToe
 Description: Play a tic-tac-toe game. Board can be of various sizes (min 3x3).
 
@@ -146,7 +146,9 @@ class TicTacToe(tk.Frame):
                         if sliced_matrix.shape != win_matrix.shape:  # Ignore sliced_matrix of incorrect shape
                             continue
 
-                        result_matrix = np.logical_and(sliced_matrix, win_matrix)
+                        # Determine if sliced_matrix matches win_matrix (using xnor)
+                        result_matrix = np.logical_xor(sliced_matrix, win_matrix)
+                        result_matrix = np.logical_not(result_matrix)
 
                         # Player has won game if fully match with win_matrix
                         if result_matrix.all():
