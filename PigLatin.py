@@ -9,6 +9,8 @@ Reference:
     https://web.ics.purdue.edu/~morelanj/RAO/prepare2.html
 """
 
+import re
+
 def is_consonant(s: str) -> bool :
     return not is_vowel(s)
     
@@ -22,52 +24,47 @@ def encode(s: str) -> str :
         raise "Nothing to encode"
 
     output = ""
-    words = s.split(' ')
+    tokens = re.split('([^a-zA-Z])', s)
 
-    for w in words:
+    for t in tokens:
 
-        is_capitalized = w[0].isupper()
-        has_symbol = not w.isalpha()
+        # Not a word, probably a symbol
+        if not t.isalpha():
+            output += t
+            continue
 
-        trailing_symbol = " "
-
-        w_ = w
-
-        # TODO: handle symbols
-
+        is_capitalized = t[0].isupper()
+        word = t.lower()
+        
         # First character is a vowel
-        if is_vowel(w_[0]):
-            output += (w_.capitalize() if is_capitalized else w_) + "way" + trailing_symbol
+        if is_vowel(word[0]):
+            output += (word.capitalize() if is_capitalized else word) + "way"
             continue
 
         '''
         Note: English only have 'I' and 'A/a' as one-letter words
-              which has been handled by the first letter vowel case above.
+              which has been handled by the first-letter-vowel case above.
 
-              Check is still done below, in case the `s` has been cipher encoded
-              in some othet ways, which results in non-vowel one-letter words.
+              Check is still done below, in case the `s` has been cipher-encoded
+              in some other way, which results in non-vowel one-letter words.
         '''
 
-        # First character is a consonant, only need check second character
-
-        if len(w_) == 1:
-            output += (w_.capitalize() if is_capitalized else w_) + "ay" + trailing_symbol
+        if len(word) == 1:
+            output += (word.capitalize() if is_capitalized else word) + "ay"
             continue
 
-        w_ = w.lower()
-        w_out = ""
+        # First character is a consonant, only need check second character
+        
 
-        if is_vowel(w_[1]):
-            # first letter of the word at the end of the word
-            w_out = w_[1:] + w_[0]
+        if is_vowel(word[1]):
+            # move first letter of the word at the end of the word
+            word = word[1:] + word[0]
         else:
             # move the two consonants to the end of the word
-            w_out = w_[2:] + w_[:2]
+            word = word[2:] + word[:2]
 
-        w_out = (w_out.capitalize() if is_capitalized else w_out)
+        output += (word.capitalize() if is_capitalized else word) + "ay"
 
-        output += w_out + "ay" + trailing_symbol
-    
     return output.strip()
 
 def decode(s: str) -> str :
@@ -75,18 +72,16 @@ def decode(s: str) -> str :
     # TODO
 
 if __name__ == "__main__":
-    #print(encode("Hello world!"), "\n")
-    print(encode("Witch"), "\n")
-
     assert encode("Happy") == "Appyhay" # C + V
     assert encode("Awesome") == "Awesomeway" # V
     assert encode("Childe") == "Ildechay" # C + C
 
     assert encode("I am a car") == "Iway amway away arcay" # One-letter words
 
-    # With trailing symbols
-    #assert encode("Hello World!") == "Ellohay Orldway!"
-    #assert encode("Pig Latin is hard to speak.") == "Igpay Atinlay isway ardhay otay eakspay."
+    # With symbols
+    assert encode("127.0.0.1") == "127.0.0.1"
+    assert encode("Hello, World!") == "Ellohay, Orldway!"
+    assert encode("Pig Latin is hard to speak.") == "Igpay Atinlay isway ardhay otay eakspay."
 
     # TODO: how to decode this
     SAME_STRING = "Itchway"
