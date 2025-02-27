@@ -25,7 +25,7 @@ class HighscoreManager:
             json.dump(self.data, file, indent=4)
 
 
-    def score_to_beat(self, ascending=True, difficulty=None):
+    def score_to_beat(self, ascending, difficulty=None):
         # No existing save, nothing to beat
         if self.game not in self.data:
             return None 
@@ -48,22 +48,32 @@ class HighscoreManager:
             return max(highscores, key=lambda x: x['score'])['score']
 
 
-    def add_score(self, name, score, difficulty=None):
+    def add_score(self, name, score, ascending, difficulty=None):
+        # Create save for this game
         if self.game not in self.data:
             self.data[self.game] = {}
+
         if difficulty:
             difficulty = str(difficulty)
+
+            # Create save for this game's difficulty
             if difficulty not in self.data[self.game]:
                 self.data[self.game][difficulty] = []
+
             self.data[self.game][difficulty].append({"name": name, "score": score})
+            # Clean up highscores
+            self.data[self.game][difficulty] = sorted(self.data[self.game][difficulty], key=lambda x: x['score'], reverse=not ascending)[:self.limit]
         else:
             if not isinstance(self.data[self.game], list):
                 self.data[self.game] = []
             self.data[self.game].append({"name": name, "score": score})
+            # Clean up highscores
+            self.data[self.game] = sorted(self.data[self.game], key=lambda x: x['score'], reverse=not ascending)[:self.limit]
+        
         self._save_data()
 
 
-    def print_scores(self, ascending=True):
+    def print_scores(self, ascending):
         if self.game in self.data:
             if isinstance(self.data[self.game], list):
                 scores = sorted(self.data[self.game], key=lambda x: x['score'], reverse=not ascending)

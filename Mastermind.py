@@ -118,10 +118,10 @@ if __name__ == "__main__":
           f"{numbers(secret)}.")
     
     # Check if score is a highscore
-    score_to_beat = highscore.score_to_beat(difficulty=difficulty)
+    score_to_beat = highscore.score_to_beat(True, difficulty)
     if score_to_beat is None or turn_count <= score_to_beat:
         player_name = input("Congratulations! New highscore. Name: ")
         highscore.add_score(player_name, turn_count, difficulty)
 
     # Print highscores
-    highscore.print_scores()
+    highscore.print_scores(True)
