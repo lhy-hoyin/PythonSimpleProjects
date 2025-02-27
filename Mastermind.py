@@ -1,4 +1,5 @@
 import random
+from HighscoreManager import HighscoreManager
 
 
 difficulty_options = {
@@ -51,6 +52,8 @@ def give_hints(guess: str, secret: str) -> str:
     
 
 if __name__ == "__main__":
+
+    highscore = HighscoreManager("mastermind", highscore_limit=5)
 
     # Prompt user to select difficulty
     while True:
@@ -113,3 +116,12 @@ if __name__ == "__main__":
     # Correct secret code
     print(f"Correct! You took {turn_count} guess(es) to crack the code "
           f"{numbers(secret)}.")
+    
+    # Check if score is a highscore
+    score_to_beat = highscore.score_to_beat(difficulty=difficulty)
+    if score_to_beat is None or turn_count <= score_to_beat:
+        player_name = input("Congratulations! New highscore. Name: ")
+        highscore.add_score(player_name, turn_count, difficulty)
+
+    # Print highscores
+    highscore.print_scores()
